@@ -21,6 +21,10 @@ from rest_framework.authtoken import views
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from users.api.views import MedicoViewSet, UserProfileExampleViewSet
 from consultas.api.views import ConsultaViewSet
+from django.urls import path
+
+def trigger_error(request):
+    division_by_zero = 1 / 0
 
 router = SimpleRouter()
 
@@ -33,4 +37,5 @@ urlpatterns = [
     path("api/token-auth/", views.obtain_auth_token),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('sentry-debug/', trigger_error),
 ]+router.urls
