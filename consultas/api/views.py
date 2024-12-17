@@ -7,10 +7,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from consultas.api.serializers import ConsultaSerializer
 from consultas.models import Consulta
+import users.api.errors as ERRORS
 from users.api.permissions import IsMedico
-
-CONSULTA_NAO_ENCONTRADA = "Consulta não encontrada"
-
 
 class ConsultaViewSet(ModelViewSet):
     """Class representing a person"""
@@ -55,7 +53,7 @@ class ConsultaViewSet(ModelViewSet):
         # pylint: disable=E1101
         except Consulta.DoesNotExist:
             # pylint: disable=W0707
-            raise ImportError(CONSULTA_NAO_ENCONTRADA)
+            raise ImportError(ERRORS.CONSULTA_NAO_ENCONTRADA)
 
     @action(detail=True, methods=["put"], permission_classes=[IsAuthenticated])
     def atualizar_consulta(self, request):
@@ -68,7 +66,7 @@ class ConsultaViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Consulta.DoesNotExist:
             # pylint: disable=W0707
-            raise ImportError(CONSULTA_NAO_ENCONTRADA)
+            raise ImportError(ERRORS.CONSULTA_NAO_ENCONTRADA)
         except ValidationError as e:
             return Response({"errors": e.detail}, status=status.
                             HTTP_400_BAD_REQUEST)
@@ -84,7 +82,7 @@ class ConsultaViewSet(ModelViewSet):
                             status=status.HTTP_204_NO_CONTENT)
         except Consulta.DoesNotExist:
             # pylint: disable=W0707
-            raise ImportError(CONSULTA_NAO_ENCONTRADA)
+            raise ImportError(ERRORS.CONSULTA_NAO_ENCONTRADA)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.
                             HTTP_500_INTERNAL_SERVER_ERROR)

@@ -3,7 +3,8 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
+from rest_framework.exceptions import PermissionDenied,NotAuthenticated
+import users.api.errors as ERRORS
 from users.api.serializers import (MedicoCreateSerializer, MedicoSerializer,
                                    UserProfileExampleSerializer)
 from users.models import Medico, UserProfileExample
@@ -49,6 +50,34 @@ class MedicoViewSet(ModelViewSet):
                 {"Info": "Cadastro realizado!", "data": serializer_saida.data},
                 status=status.HTTP_201_CREATED)
 
+        except ValueError:
+            return Response(
+                {"Erro": ERRORS.DADOS_INVALIDOS}, status=status.HTTP_409_CONFLICT
+            )
+
+        except KeyError:
+            return Response(
+                {"Erro": ERRORS.DADOS_FALTANDO},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        except PermissionError:
+            return Response(
+                {"Erro": ERRORS.ERRO_DE_PERMISSOES},
+                status=status.HTTP_403_FORBIDDEN
+             )
+
+        except PermissionDenied:
+            return Response(
+                {"Error": ERRORS.PERMISSAO_NEGADA},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        except NotAuthenticated:
+            return Response(
+                {"Error": ERRORS.NAO_AUTORIZADO},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
         except ImportError as e:
             return Response({"error": str(e)}, status=status.
                             HTTP_500_INTERNAL_SERVER_ERROR)
