@@ -13,11 +13,9 @@ from users.api.permissions import IsMedico
 class ConsultaViewSet(ModelViewSet):
     """Class representing a person"""
 
-
     queryset = Consulta.objects.all()
     serializer_class = ConsultaSerializer
     permission_classes = [IsAdminUser | IsMedico]
-
 
     @action(detail=False, methods=["get"], permission_classes=
             [IsAuthenticated])
@@ -78,4 +76,3 @@ class ConsultaViewSet(ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.
                             HTTP_500_INTERNAL_SERVER_ERROR)
-        
