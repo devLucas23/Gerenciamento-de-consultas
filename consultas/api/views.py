@@ -16,8 +16,9 @@ class ConsultaViewSet(ModelViewSet):
     queryset = Consulta.objects.all()
     serializer_class = ConsultaSerializer
     permission_classes = [IsAdminUser | IsMedico]
+    permissions_for_medics = (IsMedico or IsAdminUser)
 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated]
+    @action(detail=False, methods=["get"], permission_classes=[permissions_for_medics]
             )
     def listar_consultas(self):
         """Function printing python version."""
@@ -30,7 +31,7 @@ class ConsultaViewSet(ModelViewSet):
             return Response({"error": str(e)}, status=status.
                             HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=["post"], permission_classes=[IsAuthenticated
+    @action(detail=False, methods=["post"], permission_classes=[permissions_for_medics
                                                                 ])
     def criar_consulta(self, request):
         """Function printing python version."""
@@ -43,7 +44,7 @@ class ConsultaViewSet(ModelViewSet):
             return Response({"errors": e.detail}, status=status.
                             HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=["get"], permission_classes=[permissions_for_medics])
     def detalhar_consulta(self):
         """Function printing python version."""
         try:
@@ -55,7 +56,7 @@ class ConsultaViewSet(ModelViewSet):
             # pylint: disable=W0707
             raise ImportError(ERRORS.CONSULTA_NAO_ENCONTRADA)
 
-    @action(detail=True, methods=["put"], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=["put"], permission_classes=[permissions_for_medics])
     def atualizar_consulta(self, request):
         """Function printing python version."""
         try:
@@ -72,7 +73,7 @@ class ConsultaViewSet(ModelViewSet):
                             HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=["delete"], permission_classes=[
-        IsAuthenticated])
+        permissions_for_medics])
     def deletar_consulta(self,):
         """Function printing python version."""
         try:

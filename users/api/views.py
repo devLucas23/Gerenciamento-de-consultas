@@ -2,6 +2,7 @@ from django.contrib.auth.models import Group, User
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import PermissionDenied,NotAuthenticated
 import users.api.errors as ERRORS
@@ -22,7 +23,7 @@ class UserProfileExampleViewSet(ModelViewSet):
 class MedicoViewSet(ModelViewSet):
     """Class representing a person"""
     serializer_class = MedicoSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 # pylint: disable=E1101
     queryset = Medico.objects.all()
 
