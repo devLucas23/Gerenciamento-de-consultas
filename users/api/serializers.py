@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from users.models import Medico, UserProfileExample
 
+
 class UserProfileExampleSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -13,6 +14,7 @@ class MedicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medico
         fields = "__all__"
+
 
 class MedicoCreateSerializer(serializers.Serializer):
     nome = serializers.CharField(max_length=140)

@@ -13,6 +13,7 @@ class UserProfileExampleViewSet(ModelViewSet):
     """Class representing a person"""
     serializer_class = UserProfileExampleSerializer
     permission_classes = [AllowAny]
+# pylint: disable=E1101
     queryset = UserProfileExample.objects.all()
     http_method_names = ['get', 'put']
 
@@ -21,9 +22,10 @@ class MedicoViewSet(ModelViewSet):
     """Class representing a person"""
     serializer_class = MedicoSerializer
     permission_classes = [AllowAny]
+# pylint: disable=E1101
     queryset = Medico.objects.all()
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         try:
             serializer = MedicoCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -34,7 +36,7 @@ class MedicoViewSet(ModelViewSet):
             )
             grupo_medicos = Group.objects.get(name="Medicos")
             novo_user.groups.add(grupo_medicos)
-
+# pylint: disable=E1101
             novo_medico = Medico.objects.create(
                 nome=serializer.validated_data['nome'],
                 crm=serializer.validated_data['crm'],
@@ -47,6 +49,6 @@ class MedicoViewSet(ModelViewSet):
                 {"Info": "Cadastro realizado!", "data": serializer_saida.data},
                 status=status.HTTP_201_CREATED)
 
-        except Exception as e:
+        except ImportError as e:
             return Response({"error": str(e)}, status=status.
                             HTTP_500_INTERNAL_SERVER_ERROR)
