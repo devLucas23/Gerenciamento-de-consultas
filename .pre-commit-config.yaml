@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args: ['--disable=C,R']  # Opcional: desativa categorias específicas como "C" (convenções) e "R" (refatoração)

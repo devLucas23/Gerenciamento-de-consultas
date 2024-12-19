@@ -11,8 +11,10 @@ class Consulta(models.Model):
     observacoes = models.TextField(blank=True)
 
     def __str__(self):
-        return f'Paciente - Médico - Horário[{self.paciente}] -  [{self.medico}] - [{self.data_horario}]'
-    
+        ret_def = 'Paciente - Médico - Horário'
+        ret_def2 = f'{self.paciente}] - [{self.medico}] - [{self.data_horario}'
+        return f'{ret_def}{ret_def2}'
+       
     class Meta:
         verbose_name = "Consulta"
         verbose_name_plural = "Consultas"
