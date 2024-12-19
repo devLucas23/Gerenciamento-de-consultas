@@ -14,7 +14,7 @@ class Consulta(models.Model):
         ret_def = 'Paciente - Médico - Horário'
         ret_def2 = f'{self.paciente}] - [{self.medico}] - [{self.data_horario}'
         return f'{ret_def}{ret_def2}'
-       
+     
     class Meta:
         verbose_name = "Consulta"
         verbose_name_plural = "Consultas"
