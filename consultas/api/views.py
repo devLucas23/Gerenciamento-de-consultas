@@ -18,7 +18,8 @@ class ConsultaViewSet(ModelViewSet):
     permission_classes = [IsAdminUser | IsMedico]
     permissions_for_medics = (IsMedico or IsAdminUser)
 
-    @action(detail=False, methods=["get"], permission_classes=[permissions_for_medics]
+    @action(detail=False, methods=["get"], permission_classes=
+            [permissions_for_medics]
             )
     def listar_consultas(self):
         """Function printing python version."""
