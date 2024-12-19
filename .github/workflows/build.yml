@@ -1,0 +1,24 @@
+name: Build and SonarQube Analysis
+on:
+  push:
+    branches:
+      - main
+      - uni02
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch the full history to ensure proper SonarQube analysis
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set by GitHub Actions by default
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Define this secret in your repository settings
