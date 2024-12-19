@@ -2,7 +2,6 @@ name: Build and SonarQube Analysis
 on:
   push:
     branches:
-      - main
       - uni02
   pull_request:
     types: [opened, synchronize, reopened]
