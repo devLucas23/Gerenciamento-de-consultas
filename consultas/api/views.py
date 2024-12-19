@@ -32,8 +32,8 @@ class ConsultaViewSet(ModelViewSet):
             return Response({"error": str(e)}, status=status.
                             HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(detail=False, methods=["post"], permission_classes=[permissions_for_medics
-                                                                ])
+    @action(detail=False, methods=["post"], permission_classes=
+            [permissions_for_medics])
     def criar_consulta(self, request):
         """Function printing python version."""
         serializer = ConsultaSerializer(data=request.data)
