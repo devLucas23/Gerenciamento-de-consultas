@@ -1,40 +1,21 @@
 name: Build and SonarQube Analysis
-
 on:
   push:
     branches:
       - main
       - uni02
   pull_request:
-    branches:
-      - main
-      - uni02
-
+    types: [opened, synchronize, reopened]
 jobs:
-  sonar-analysis:
-    runs-on: ubuntu-latest
-
+  sonarqube:
+    name: SonarQube
+    runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
         with:
-          java-version: '11'
-
-      - name: Install Sonar Scanner
-        run: |
-          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-          unzip sonar-scanner.zip
-          export PATH="$PATH:$(pwd)/sonar-scanner-4.7.0.2747-linux/bin"
-
-      - name: Run SonarQube Analysis
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
-          SONAR_TOKEN: ${{ secrets.c9642ebb7f60d949492db9928e880dfb95683ede }}
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=my_project_key \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.branch.name=${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.c9642ebb7f60d949492db9928e880dfb95683ede }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.c41bb559a017f641bc3e676833589ff55ac40775 }}
