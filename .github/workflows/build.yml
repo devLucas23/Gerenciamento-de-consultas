@@ -2,19 +2,23 @@ name: Build and SonarQube Analysis
 on:
   push:
     branches:
+      - main
       - uni02
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarqube:
     name: SonarQube
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Fetch the full history to ensure proper SonarQube analysis
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.c9642ebb7f60d949492db9928e880dfb95683ede }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.c41bb559a017f641bc3e676833589ff55ac40775 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Set by GitHub Actions by default
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Define this secret in your repository settings
