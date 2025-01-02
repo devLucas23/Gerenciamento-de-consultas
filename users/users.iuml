@@ -1,0 +1,35 @@
+@startuml
+
+' Importação da biblioteca django.contrib.auth.models.User
+class User {
+}
+
+class UserProfileExample {
+    +phone_number: CharField
+    +address: CharField
+    +birth_date: DateField
+    +user: OneToOneField
+}
+
+class Medico {
+    +nome: CharField
+    +crm: CharField
+    +departamento: CharField
+    +user: ForeignKey
+    +__str__(): str
+}
+
+class Consulta {
+    +paciente: CharField
+    +medico: ForeignKey
+    +data_horario: DateTimeField
+    +especialidade: CharField
+    +observacoes: TextField
+    +__str__(): str
+}
+
+User "1" -- "1" UserProfileExample : user
+User "1" -- "0..*" Medico : user
+Medico "1" -- "0..*" Consulta : medico
+
+@enduml
