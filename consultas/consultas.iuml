@@ -1,0 +1,23 @@
+@startuml Consultas
+
+' Importação do modelo Medico
+class Medico {
+    +nome: CharField
+    +crm: CharField
+    +departamento: CharField
+    +user: ForeignKey
+    +__str__(): str
+}
+
+class Consulta {
+    +paciente: CharField
+    +medico: ForeignKey
+    +data_horario: DateTimeField
+    +especialidade: CharField
+    +observacoes: TextField
+    +__str__(): str
+}
+
+Medico "1" -- "0..*" Consulta : medico
+
+@enduml
