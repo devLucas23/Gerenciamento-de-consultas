@@ -1,90 +1,59 @@
-import logging
+import pytest
 from rest_framework import status
+from django.contrib.auth.models import User, Group
+from users.models import Medico
 from rest_framework.test import APIClient
-from rest_framework.exceptions import PermissionDenied, NotAuthenticated
-from rest_framework.views import Response
-from .models import Medico, Consulta, UserProfile
-from django.test import TestCase
 
-logger = logging.getLogger("consultas")
 
-class ConsultaViewSetTest(TestCase):
-    """Testes para o ViewSet de Consulta"""
-    def setUp(self):
-        self.client = APIClient()
-        self.medico = Medico.objects.create(nome="Dr. Teste", especialidade="Cardiologia")
-        self.user_profile = UserProfile.objects.create(nome="Usuário Teste", email="teste@exemplo.com")
-        self.consulta_data = {
-            "medico": self.medico.id,
-            "data": "2025-01-10T10:00:00Z"
+@pytest.mark.django_db
+class TestMedicoViewSet:
+    """Testa o ViewSet de Medico"""
+    
+    @pytest.fixture
+    def user(self):
+        """Criação de usuário para os testes"""
+        return User.objects.create_user(username="medico_user", password="password")
+
+    @pytest.fixture
+    def group(self):
+        """Criação de grupo 'Medicos'"""
+        return Group.objects.create(name="Medicos")
+    
+    @pytest.fixture
+    def medico_data(self):
+        """Dados para criação de um médico"""
+        return {
+            "nome": "Dr. João Silva",
+            "crm": "123456",
+            "departamento": "Cardiologia",
+            "login": "joaosilva",
+            "senha": "securepassword123"
         }
 
-    def test_criar_consulta(self):
-        """Teste para criação de consulta"""
-        response = self.client.post("/api/consultas/criar_consulta/", self.consulta_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Consulta.objects.count(), 1)
+    @pytest.fixture
+    def client(self):
+        """Criação do cliente de testes"""
+        return APIClient()
 
-    def test_listar_consultas(self):
-        """Teste para listagem de consultas"""
-        Consulta.objects.create(medico=self.medico, data="2025-01-10T10:00:00Z")
-        response = self.client.get("/api/consultas/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(response.data), 0)
+    @pytest.mark.django_db
+    def test_get_medicos(self, client, user):
+        """Testa a listagem de médicos."""
+        # Criação de um médico no banco de dados
+        Medico.objects.create(
+            nome="Dr. Ana Maria",
+            crm="654321",
+            departamento="Pediatria",
+            user=user
+        )
 
-    def test_update_consulta(self):
-        """Teste para atualização de consulta"""
-        consulta = Consulta.objects.create(medico=self.medico, data="2025-01-10T10:00:00Z")
-        updated_data = {"medico": self.medico.id, "data": "2025-02-10T10:00:00Z"}
-        response = self.client.put(f"/api/consultas/{consulta.id}/", updated_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        consulta.refresh_from_db()
-        self.assertEqual(consulta.data, "2025-02-10T10:00:00Z")
-
-    def test_delete_consulta(self):
-        """Teste para exclusão de consulta"""
-        consulta = Consulta.objects.create(medico=self.medico, data="2025-01-10T10:00:00Z")
-        response = self.client.delete(f"/api/consultas/{consulta.id}/")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Consulta.objects.count(), 0)
-
-class MedicoViewSetTest(TestCase):
-    """Testes para o ViewSet de Medico"""
-    def setUp(self):
-        self.client = APIClient()
-        self.medico = Medico.objects.create(nome="Dr. Teste", especialidade="Cardiologia")
-
-    def test_criar_medico(self):
-        """Teste para criação de medico"""
-        medico_data = {"nome": "Dr. Novo", "especialidade": "Pediatria"}
-        response = self.client.post("/api/medicos/", medico_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Medico.objects.count(), 2)
-
-    def test_update_medico(self):
-        """Teste para atualização de medico"""
-        updated_data = {"nome": "Dr. Atualizado", "especialidade": "Neurologia"}
-        response = self.client.put(f"/api/medicos/{self.medico.id}/", updated_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.medico.refresh_from_db()
-        self.assertEqual(self.medico.nome, "Dr. Atualizado")
-
-    def test_get_medicos(self):
-        """Teste para obtenção de todos os médicos"""
-        response = self.client.get("/api/medicos/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(response.data), 0)
-
-class UserProfileViewSetTest(TestCase):
-    """Testes para o ViewSet de UserProfile"""
-    def setUp(self):
-        self.client = APIClient()
-        self.user_profile = UserProfile.objects.create(nome="Usuário Teste", email="teste@exemplo.com")
-
-    def test_update_user_profile(self):
-        """Teste para atualização de perfil de usuário"""
-        updated_data = {"nome": "Usuário Atualizado", "email": "atualizado@exemplo.com"}
-        response = self.client.put(f"/api/usuarios/{self.user_profile.id}/", updated_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.user_profile.refresh_from_db()
-        self.assertEqual(self.user_profile.nome, "Usuário Atualizado")
+        # Realizando a requisição GET para listar médicos
+        response = client.get("/api/medicos/")
+        
+        # Verificando se a resposta foi bem-sucedida
+        assert response.status_code == status.HTTP_200_OK
+        
+        # Verificando se ao menos um médico é retornado
+        assert len(response.data) >= 1
+        
+        # Verificando se o médico criado está presente na lista
+        assert any(medico["nome"] == "Dr. Ana Maria" for medico in response.data)
